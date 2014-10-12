@@ -1,0 +1,23 @@
+{
+  "name": "todomvc",
+  "version": "0.0.1",
+  "homepage": "https://github.com/paullasarev/todomvc",
+  "authors": [
+    "paullasarev <paullasarev@gmail.com>"
+  ],
+  "description": "todo mvc",
+  "main": "app/index.html",
+  "keywords": [
+    "todo",
+    "mvd",
+    "angular"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
