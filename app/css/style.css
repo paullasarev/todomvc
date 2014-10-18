@@ -2,7 +2,14 @@ body {
   margin:0;
 }
 
-.header {
+.todo {
+  background-color: #e0e0e0;
+  width: 550px;
+  margin-left: auto;
+  margin-right: auto;  
+}
+
+.todo__header {
   text-align: center;
   height: 100px;
   line-height: 100px;
@@ -12,4 +19,6 @@ body {
   font-size: 70px;
   font-weight: bold;
   font-family: Helvetica;
+  color: #c7c7c7;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
 }

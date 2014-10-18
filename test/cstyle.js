@@ -1,7 +1,10 @@
 ;(function(){
   var $ = need.import('jQuery');
+  var tinycolor = need.import('tinycolor');
 
   var module = {
+    tinycolor: tinycolor,
+
     getOffsetRect: function(selector) {
       return this.getElementOffsetRect($(selector).get(0));
     },
@@ -75,6 +78,19 @@
         && this.isVerticallyCentered(frameSelector, elementSelector);
     },
 
+    isOnTop: function (frameSelector, elementSelector) {
+      var frameEl=$(frameSelector);
+      var elementEl=$(elementSelector);
+      var frameRect=this.getElementOffsetRect(frameEl.get(0));
+      var elementRect=this.getElementOffsetRect(elementEl.get(0));
+
+      if (elementRect.top != frameRect.top)
+        throw this.formatRequired(this.format("top '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementRect.top, frameRect.top);
+
+      return true;
+    },
+
     isContentCentered: function (frameSelector, elementSelector) {
       if (!this.isHorisontallyCentered(frameSelector, elementSelector)) return false;
 
@@ -91,16 +107,16 @@
       return margin === 0 && padding === 0 && border===0;
     },
 
-    isOnTop: function (frameSelector, elementSelector) {
-      return false;
-    },
-
     getText: function(selector) {
       return $(selector).text().trim();
     },
 
     getHeight: function(selector) {
-      return this.getElementOffsetRect($(selector).get(0)).height;
+      return this.getOffsetRect(selector).height;
+    },
+
+    getWidth: function(selector) {
+      return this.getOffsetRect(selector).width;
     },
 
     isTextVCentered: function(selector) {
@@ -189,6 +205,23 @@
         if (font.family !== value)
           throw this.formatRequired("font-family", value, font.family);
       }
+
+      return true;
+    },
+
+    isColor: function(selector, colorProperty, value) {
+      var el = $(selector);
+      var color = el.css(colorProperty);
+      if (this.tinycolor(color).toHexString() !== this.tinycolor(value).toHexString() )
+        throw this.formatRequired(colorProperty, color, value);
+      return true;
+    },
+
+    haveProperty: function(selector, property) {
+      var el = $(selector);
+      var prop = el.css(property);
+      if (!prop || prop == 'none')
+        throw this.format("selector '{0}' have not CSS property '{1}'", selector, property);
 
       return true;
     },
