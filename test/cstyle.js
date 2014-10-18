@@ -31,14 +31,8 @@
     },
 
     isHorisontallyCentered: function (frameSelector, elementSelector) {
-      var frameEl=$(frameSelector);
-      var elementEl=$(elementSelector);
-      var frameRect=this.getElementOffsetRect(frameEl.get(0));
-      var elementRect=this.getElementOffsetRect(elementEl.get(0));
-
-      // var frameLeftMargin = this.pixelsToInt(frameEl.css("margin-left"));
-      // var frameRightMargin = this.pixelsToInt(frameEl.css("margin-right"));
-      // var frameFullWidth = frameRect.width + frameLeftMargin + frameRightMargin;
+      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
+      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       var frameCenter = frameRect.left + frameRect.width / 2.0;
       var elementCenter = elementRect.left + elementRect.width / 2.0;
@@ -55,10 +49,8 @@
     },
 
     isVerticallyCentered: function (frameSelector, elementSelector) {
-      var frameEl=$(frameSelector);
-      var elementEl=$(elementSelector);
-      var frameRect=this.getElementOffsetRect(frameEl.get(0));
-      var elementRect=this.getElementOffsetRect(elementEl.get(0));
+      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
+      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       var frameCenter = frameRect.top + frameRect.height / 2.0;
       var elementCenter = elementRect.top + elementRect.height / 2.0;
@@ -79,10 +71,8 @@
     },
 
     isOnTop: function (frameSelector, elementSelector) {
-      var frameEl=$(frameSelector);
-      var elementEl=$(elementSelector);
-      var frameRect=this.getElementOffsetRect(frameEl.get(0));
-      var elementRect=this.getElementOffsetRect(elementEl.get(0));
+      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
+      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.top != frameRect.top)
         throw this.formatRequired(this.format("top '{0}' in '{1}'", elementSelector, frameSelector)
@@ -91,9 +81,29 @@
       return true;
     },
 
-    isContentCentered: function (frameSelector, elementSelector) {
-      if (!this.isHorisontallyCentered(frameSelector, elementSelector)) return false;
+    isFitWidth: function (frameSelector, elementSelector) {
+      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
+      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
+      if (elementRect.left != frameRect.left || elementRect.right != frameRect.right)
+        throw this.formatRequired(this.format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementRect.left, frameRect.left);
+
+      return true;
+    },
+
+    isUnder: function (frameSelector, elementSelector) {
+      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
+      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
+
+      if (elementRect.top != frameRect.bottom)
+        throw this.formatRequired(this.format("'{0}' under '{1}'", elementSelector, frameSelector)
+         , elementRect.top, frameRect.bottom);
+
+      return true;
+    },
+
+    isTextCentered: function (elementSelector) {
       var textAlign = $(elementSelector).css("text-align");
 
       return textAlign === "center";
