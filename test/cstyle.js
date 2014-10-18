@@ -44,7 +44,11 @@
       var success = (offset <= 0.5);
 
       //http://javascript.ru/ui/offset
-      return success;
+      if (!success)
+        throw this.formatRequired(this.format("horisontal center of '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementCenter, frameCenter);
+
+      return true;
     },
 
     isVerticallyCentered: function (frameSelector, elementSelector) {
@@ -53,17 +57,17 @@
       var frameRect=this.getElementOffsetRect(frameEl.get(0));
       var elementRect=this.getElementOffsetRect(elementEl.get(0));
 
-      // var frameTopMargin = this.pixelsToInt(frameEl.css("margin-top"));
-      // var frameBottomMargin = this.pixelsToInt(frameEl.css("margin-bottom"));
-      // var frameFullHeight = frameRect.height + frameTopMargin + frameBottomMargin;
-
       var frameCenter = frameRect.top + frameRect.height / 2.0;
       var elementCenter = elementRect.top + elementRect.height / 2.0;
 
       var offset = Math.abs(frameCenter - elementCenter);
       var success = (offset <= 0.5);
 
-      return success;
+      if (!success)
+        throw this.formatRequired(this.format("vertical center of '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementCenter, frameCenter);
+
+      return true;
     },
 
     isCentered: function (frameSelector, elementSelector) {
