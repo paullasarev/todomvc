@@ -236,6 +236,14 @@
       return true;
     },
 
+    isTag: function(selector, tagName) {
+      var value = $(selector).get(0).tagName;
+      if (value.toLowerCase() !== tagName.toLowerCase())
+        throw this.formatRequired("tag name", value, tagName);
+
+      return true;
+    },
+
   };
 
   need.export('cstyle', module);

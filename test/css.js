@@ -86,5 +86,10 @@ describe("css", function(){
       expect(cstyle.isColor('.caption__splitter', 'background-color', splitterColor));
      });
     
+    it('should have input', function() {
+      expect(cstyle.isUnder('.caption__splitter', '.caption__input'));
+      expect(cstyle.isFitWidth('.todo', '.caption__input'));
+      expect(cstyle.isTag('.caption__input', 'input'));
+    });
   });
 });
