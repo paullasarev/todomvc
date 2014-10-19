@@ -1,9 +1,100 @@
 ;(function(){
   var $ = need.import('jQuery');
-  var tinycolor = need.import('tinycolor');
+  var _tinycolor = need.import('tinycolor');
+
+  var _pixelsToInt = function (val) {
+    return parseInt(val, 10);
+  };
+
+  var _format = function(msg, val0, val1) {
+    return msg.replace("{0}", val0). replace("{1}", val1);
+  };
+
+  var _formatRequired = function(msg0, val0, val1) {
+    var msg = msg0 + " is '{0}' while required '{1}'";
+    return _format(msg, val0, val1);
+  };
+
+  var _formatUnknown = function(msg, val) {
+    return _format("unknown '{0}: {1}'", msg, val);
+  };
+
+  var _compareColor = function(etalon, value, msg) {
+    if (_tinycolor(etalon).toHexString() !== _tinycolor(value).toHexString())
+      throw new Error(_formatRequired(msg, value, etalon));
+  };
+
+  var _comparePixels = function(etalon, value, msg) {
+    if (_pixelsToInt(etalon) !== _pixelsToInt(value))
+      throw new Error(_formatRequired(msg, value, etalon));
+  };
+
+  var _compareValues = function(etalon, value, msg) {
+    if (etalon !== value)
+      throw new Error(_formatRequired(msg, value, etalon));
+  };
+
+  var _parseBorder = function(border, borderStyle, borderWidth, borderColor) {
+    var parts = border.split(' ');
+    if (parts.length > 0 )
+      borderStyle = parts[0];
+    if (parts.length > 1 )
+      borderWidth = parts[1];
+    if (parts.length > 2 )
+      borderColor = parts[2];
+  };
+
+  var _findStyleSheet = function(selector) {
+    var i,j;
+    for(i = 0; i < document.styleSheets.length; ++i) {
+      var styleSheet = document.styleSheets[i];
+      var rules = styleSheet.cssRules;
+      if (!rules)
+        rules = styleSheet.rules;
+      if (!rules)
+        continue;
+      for(j = 0; j < rules.length; ++j) {
+        var rule = rules[j];
+
+        if(selector === rule.selectorText) {
+          return {
+            css: function(property) {
+              return rule.style[property];
+            }
+          };
+        }
+      }
+    }
+    throw new Error(_format("didn't find pseudo selector {0}", selector));  
+  };
+
+  var _getCssAccessors = function(selector, pseudo, browsers) {
+    var results = [];
+    if (!pseudo)
+      results.push($(selector));
+
+    if (!browsers)
+      browsers = ['webkit', 'moz', 'ie'];
+    else if (typeof browsers == 'string')
+      browsers = browsers.split(',');
+
+    if (pseudo === 'placeholder') {
+      if (browsers.indexOf('webkit') >= 0 )
+        results.push(_findStyleSheet(selector + "::-webkit-input-placeholder"));
+      if (browsers.indexOf('moz') >= 0 )
+        results.push(_findStyleSheet(selector + "::-moz-placeholder"));
+      if (browsers.indexOf('ie') >= 0 )
+        results.push(_findStyleSheet(selector + ":-ie-input-placeholder"));
+    }
+
+    if (!results.length)
+      throw new Error(_format("no CSS accessors for '{0}/{1}'", selector, pseudo));
+
+    return results;
+  };
 
   var module = {
-    tinycolor: tinycolor,
+    tinycolor: _tinycolor,
 
     getOffsetRect: function(selector) {
       return this.getElementOffsetRect($(selector).get(0));
@@ -26,10 +117,6 @@
       };
     },
 
-    pixelsToInt: function (val) {
-      return parseInt(val, 10);
-    },
-
     isHorisontallyCentered: function (frameSelector, elementSelector) {
       var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
@@ -42,7 +129,7 @@
 
       //http://javascript.ru/ui/offset
       if (!success)
-        throw this.formatRequired(this.format("horisontal center of '{0}' in '{1}'", elementSelector, frameSelector)
+        throw _formatRequired(_format("horisontal center of '{0}' in '{1}'", elementSelector, frameSelector)
          , elementCenter, frameCenter);
 
       return true;
@@ -59,7 +146,7 @@
       var success = (offset <= 0.5);
 
       if (!success)
-        throw this.formatRequired(this.format("vertical center of '{0}' in '{1}'", elementSelector, frameSelector)
+        throw _formatRequired(_format("vertical center of '{0}' in '{1}'", elementSelector, frameSelector)
          , elementCenter, frameCenter);
 
       return true;
@@ -75,7 +162,7 @@
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.top != frameRect.top)
-        throw this.formatRequired(this.format("top '{0}' in '{1}'", elementSelector, frameSelector)
+        throw _formatRequired(_format("top '{0}' in '{1}'", elementSelector, frameSelector)
          , elementRect.top, frameRect.top);
 
       return true;
@@ -86,7 +173,7 @@
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.left != frameRect.left || elementRect.right != frameRect.right)
-        throw this.formatRequired(this.format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
+        throw _formatRequired(_format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
          , String(elementRect.left) + "/" + String(elementRect.right)
          , String(frameRect.left) + "/" + String(frameRect.right));
 
@@ -98,7 +185,7 @@
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.top != frameRect.bottom)
-        throw this.formatRequired(this.format("'{0}' under '{1}'", elementSelector, frameSelector)
+        throw _formatRequired(_format("'{0}' under '{1}'", elementSelector, frameSelector)
          , elementRect.top, frameRect.bottom);
 
       return true;
@@ -112,9 +199,9 @@
 
     isContentOnly: function (selector) {
       var el = $(selector);
-      var margin = this.pixelsToInt(el.css('margin'));
-      var padding = this.pixelsToInt(el.css('padding'));
-      var border = this.pixelsToInt(el.css('border'));
+      var margin = _pixelsToInt(el.css('margin'));
+      var padding = _pixelsToInt(el.css('padding'));
+      var border = _pixelsToInt(el.css('border'));
       return margin === 0 && padding === 0 && border===0;
     },
 
@@ -132,23 +219,11 @@
 
     isTextVCentered: function(selector) {
       var el = $(selector);
-      var height = this.pixelsToInt(el.css('height'));
-      var lineHeight = this.pixelsToInt(el.css('line-height'));
+      var height = _pixelsToInt(el.css('height'));
+      var lineHeight = _pixelsToInt(el.css('line-height'));
       return height === lineHeight && height > 0;
     },
 
-    format: function(msg, val0, val1) {
-      return msg.replace("{0}", val0). replace("{1}", val1);
-    },
-
-    formatRequired: function(msg0, val0, val1) {
-      var msg = msg0 + " is '{0}' while required '{1}'";
-      return this.format(msg, val0, val1);
-    },
-
-    formatUnknown: function(msg, val) {
-      return this.format("unknown '{0}: {1}'", msg, val);
-    },
 
     isGenericFontFamily: function(family) {
       return family === "serif" || family === "sans-serif" || family === "monospace"
@@ -179,43 +254,43 @@
         ) 
         return "monospace";
 
-      throw this.formatUnknown("font generic family", family);
+      throw _formatUnknown("font generic family", family);
     },
 
-    isFont: function(selector, font) {
-      var el = $(selector);
-      var value;
-      if (font.size) {
-        value = el.css("font-size");
-        if (this.pixelsToInt(font.size) !== this.pixelsToInt(value))
-          throw this.formatRequired("font-size", value, font.size);
-      }
-      if (font.weight) {
-        //font-weight: normal|bold|bolder|lighter|number|initial|inherit;
-        value = el.css("font-weight");
-        if (font.weight !== value)
-          throw this.formatRequired("font-weight'", value, font.weight);
-      }
-      if (font.style) {
-        //"style:normal|italic|oblique"
-        value = el.css("font-style");
-        if (font.style !== value)
-          throw this.formatRequired("font-style", value, font.style);
-      }
-      if (font.variant) {
-        //variant: normal|small-caps|initial|inherit
-        value = el.css("font-variant");
-        if (font.variant !== value)
-          throw this.formatRequired("font-variant", value, font.variant);
-      }
-      if (font.family) {
-        value = el.css("font-family");
-        if (this.isGenericFontFamily(font.family)) {
-          value = this.getGenericFontFamily(value);
+    isFont: function(selector, font, pseudo/*=null*/, browsers/*=null*/) {
+      var variants = _getCssAccessors(selector, pseudo, browsers);
+      for (var i = 0; i < variants.length; i++) {
+        var el = variants[i];
+
+        //var el = $(selector);
+        var value;
+        if (font.size) {
+          value = el.css("font-size");
+          _comparePixels(font.size, value, "font-size");
         }
-        if (font.family !== value)
-          throw this.formatRequired("font-family", value, font.family);
-      }
+        if (font.weight) {
+          //font-weight: normal|bold|bolder|lighter|number|initial|inherit;
+          value = el.css("font-weight");
+          _compareValues(font.weight, value, "font-weight");
+        }
+        if (font.style) {
+          //"style:normal|italic|oblique"
+          value = el.css("font-style");
+          _compareValues(font.style, value, "font-style");
+        }
+        if (font.variant) {
+          //variant: normal|small-caps|initial|inherit
+          value = el.css("font-variant");
+          _compareValues(font.variant, value, "font-variant");
+        }
+        if (font.family) {
+          value = el.css("font-family");
+          if (this.isGenericFontFamily(font.family)) {
+            value = this.getGenericFontFamily(value);
+          }
+          _compareValues(font.family, value, "font-family");
+        }
+      };
 
       return true;
     },
@@ -223,8 +298,7 @@
     isColor: function(selector, colorProperty, value) {
       var el = $(selector);
       var color = el.css(colorProperty);
-      if (this.tinycolor(color).toHexString() !== this.tinycolor(value).toHexString() )
-        throw this.formatRequired(colorProperty, color, value);
+      _compareColor(value, color, colorProperty);
       return true;
     },
 
@@ -232,7 +306,7 @@
       var el = $(selector);
       var prop = el.css(property);
       if (!prop || prop == 'none')
-        throw this.format("selector '{0}' have not CSS property '{1}'", selector, property);
+        throw _format("selector '{0}' have not CSS property '{1}'", selector, property);
 
       return true;
     },
@@ -240,9 +314,46 @@
     isTag: function(selector, tagName) {
       var value = $(selector).get(0).tagName;
       if (value.toLowerCase() !== tagName.toLowerCase())
-        throw this.formatRequired("tag name", value, tagName);
+        throw _formatRequired("tag name", value, tagName);
 
       return true;
+    },
+
+    isBox: function(selector, box) {
+      var el = $(selector);
+      var value;
+      if (box.padding) {
+        value = el.css("padding");
+        _comparePixels(box.padding, value, "padding");
+      }
+      if (box.margin) {
+        value = el.css("margin");
+        _comparePixels(box.margin, value, "margin");
+      }
+      if (box.border) {
+        var borderStyle, borderWidth, borderColor;
+        _parseBorder(box.border, borderStyle, borderWidth, borderColor);
+        if (borderStyle) {
+          value = el.css("border-style");
+          _compareValues(borderStyle, value, "style");
+        }
+        if (borderWidth) {
+          value = el.css("border-width");
+          _comparePixels(borderWidth, value, "width");
+        }
+        if (borderColor) {
+          value = el.css("border-color");
+          _compareColor(borderColor, value, "border-color");
+        }
+      }
+
+      return true;
+    },
+
+    isAttribute: function(selector, attrName, attrValue) {
+      var el = $(selector);
+      var value = el.attr(attrName);
+      _compareValues(attrValue, value, attrName);
     },
 
   };

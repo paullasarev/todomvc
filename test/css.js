@@ -1,11 +1,18 @@
 describe("css", function(){
   var expect = need.import('chai').expect;
   var ctyle = need.import('cstyle');
+
   var bodyBackgroundColor = '#e0e0e0';
   var headerTitleTextColor = '#c7c7c7';
   var todoWidth = 550;
+
   var splitterHeight = 15;
   var splitterColor = '#7f6f68';
+
+  var inputHeight = 48;
+  var inputFontSize = 24;
+  var inputPadding = 16;
+  var inputBackgroundColor = "#f4f4f4";
 
   describe("body", function(){
     it('body should be clean', function() {
@@ -90,6 +97,31 @@ describe("css", function(){
       expect(cstyle.isUnder('.todo__splitter', '.todo__input'));
       expect(cstyle.isFitWidth('.todo', '.todo__input'));
       expect(cstyle.isTag('.todo__input', 'input'));
+    });
+
+    it('should fix input parameters', function() {
+      expect(cstyle.getHeight('.todo__input')).equal(inputHeight);
+      cstyle.isBox('.todo__input', {
+        padding: inputPadding,
+        border: "none",
+        margin: 0,
+      });
+      expect(cstyle.isFont('.todo__input', {
+        size: inputFontSize,
+        style: "normal",
+        family: "sans-serif",
+      }));
+
+      cstyle.isColor('.todo__input', 'background-color', inputBackgroundColor);
+
+      cstyle.isAttribute('.todo__input', 'placeholder', 'What needs to be done?');
+    });
+      
+    it('input placeholder font should be italic', function() {
+      cstyle.isFont('.todo__input',  {
+        style: 'italic',
+        weight: '200'
+      }, 'placeholder', 'webkit');
     });
   });
 });

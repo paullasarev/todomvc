@@ -35,5 +35,21 @@ body {
 .todo__input {
   display: block;
   box-sizing: border-box;
+  padding: 16px;
   width: 100%;
+  height: 48px;
+  font-size: 24px;
+  font-style: normal;
+  font-family: Helvetica;
+  background-color: #f4f4f4;
 }
+
+.todo__input::-webkit-input-placeholder {
+  font-style: italic;
+  font-weight: 200;
+}
+
+.todo__input::-moz-placeholder {
+  font-style: italic;
+}
+
