@@ -10,8 +10,9 @@ describe("css", function(){
   var splitterColor = '#7f6f68';
 
   var inputHeight = 48;
-  var inputFontSize = 24;
-  var inputPadding = 16;
+  var inputFontSize = 23;
+  var inputLeftPadding = 40;
+  var inputRightPadding = 16;
   var inputBackgroundColor = "#f4f4f4";
 
   describe("body", function(){
@@ -102,7 +103,8 @@ describe("css", function(){
     it('should fix input parameters', function() {
       expect(cstyle.getHeight('.todo__input')).equal(inputHeight);
       cstyle.isBox('.todo__input', {
-        padding: inputPadding,
+        paddingLeft: inputLeftPadding,
+        paddingRight: inputRightPadding,
         border: "none",
         margin: 0,
       });
@@ -122,6 +124,7 @@ describe("css", function(){
         style: 'italic',
         weight: '200'
       });
+      cstyle.isColor('.todo__input:placeholder', 'color', '#999999');
     });
   });
 });

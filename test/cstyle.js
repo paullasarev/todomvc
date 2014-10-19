@@ -3,6 +3,8 @@
   var _tinycolor = need.import('tinycolor');
 
   var _pixelsToInt = function (val) {
+    if (!val)
+      return 0;
     return parseInt(val, 10);
   };
 
@@ -34,14 +36,30 @@
       throw new Error(_formatRequired(msg, value, etalon));
   };
 
-  var _parseBorder = function(border, borderStyle, borderWidth, borderColor) {
+  var _none = function(value) {
+    if (!value)
+      return 'none';
+    return value;
+  };
+
+  var _parseBorder = function(border) {
+    var result = {};
     var parts = border.split(' ');
     if (parts.length > 0 )
-      borderStyle = parts[0];
+      result.style = parts[0];
     if (parts.length > 1 )
-      borderWidth = parts[1];
+      result.width = parts[1];
     if (parts.length > 2 )
-      borderColor = parts[2];
+      result.color = parts[2];
+    return result;
+  };
+
+  var _normWeight = function(weight) {
+    if (weight === '700')
+      return 'bold';
+    if (weight === '400')
+      return 'normal';
+    return weight;
   };
 
   var _getCssPrefix = function() {
@@ -51,6 +69,12 @@
     )[1];
     return prefix;
   }
+
+  var _camelCase = function(input) { 
+    return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
+        return group1.toUpperCase();
+    });
+  };
 
   var _cssPrefix = _getCssPrefix();
 
@@ -69,7 +93,7 @@
         if(selector === rule.selectorText) {
           return {
             css: function(property) {
-              return rule.style[property];
+              return rule.style[_camelCase(property)];
             }
           };
         }
@@ -279,7 +303,7 @@
       if (font.weight) {
         //font-weight: normal|bold|bolder|lighter|number|initial|inherit;
         value = el.css("font-weight");
-        _compareValues(font.weight, value, "font-weight");
+        _compareValues(_normWeight(font.weight), _normWeight(value), "font-weight");
       }
       if (font.style) {
         //"style:normal|italic|oblique"
@@ -329,28 +353,40 @@
     isBox: function(selector, box) {
       var el = _getCssAccessor(selector);
       var value;
+
       if (box.padding) {
-        value = el.css("padding");
-        _comparePixels(box.padding, value, "padding");
+        _comparePixels(box.padding, el.css("padding-left"), "padding-left");
+        _comparePixels(box.padding, el.css("padding-right"), "padding-right");
+        _comparePixels(box.padding, el.css("padding-top"), "padding-top");
+        _comparePixels(box.padding, el.css("padding-bottom"), "padding-bottom");
       }
+      if (box['padding-left'])
+        _comparePixels(box.padding, el.css("padding-left"), "padding-left");
+      if (box['padding-right'])
+        _comparePixels(box.padding, el.css("padding-right"), "padding-right");
+      if (box['padding-top'])
+        _comparePixels(box.padding, el.css("padding-top"), "padding-top");
+      if (box['padding-bottom'])
+        _comparePixels(box.padding, el.css("padding-bottom"), "padding-bottom");
+
       if (box.margin) {
         value = el.css("margin");
         _comparePixels(box.margin, value, "margin");
       }
+
       if (box.border) {
-        var borderStyle, borderWidth, borderColor;
-        _parseBorder(box.border, borderStyle, borderWidth, borderColor);
-        if (borderStyle) {
+        var border = _parseBorder(box.border);
+        if (border.style) {
           value = el.css("border-style");
-          _compareValues(borderStyle, value, "style");
+          _compareValues(_none(border.style), _none(value), "style");
         }
-        if (borderWidth) {
+        if (border.width) {
           value = el.css("border-width");
-          _comparePixels(borderWidth, value, "width");
+          _comparePixels(border.width, value, "width");
         }
-        if (borderColor) {
+        if (border.color) {
           value = el.css("border-color");
-          _compareColor(borderColor, value, "border-color");
+          _compareColor(border.color, value, "border-color");
         }
       }
 
