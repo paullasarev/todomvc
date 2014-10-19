@@ -118,10 +118,10 @@ describe("css", function(){
     });
       
     it('input placeholder font should be italic', function() {
-      cstyle.isFont('.todo__input',  {
+      cstyle.isFont('.todo__input:placeholder',  {
         style: 'italic',
         weight: '200'
-      }, 'placeholder', 'webkit');
+      });
     });
   });
 });

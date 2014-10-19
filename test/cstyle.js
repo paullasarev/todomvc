@@ -44,6 +44,16 @@
       borderColor = parts[2];
   };
 
+  var _getCssPrefix = function() {
+    var styles = window.getComputedStyle(document.documentElement, '');
+    var prefix = (Array.prototype.slice.call(styles).join('') 
+      .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
+    )[1];
+    return prefix;
+  }
+
+  var _cssPrefix = _getCssPrefix();
+
   var _findStyleSheet = function(selector) {
     var i,j;
     for(i = 0; i < document.styleSheets.length; ++i) {
@@ -68,29 +78,30 @@
     throw new Error(_format("didn't find pseudo selector {0}", selector));  
   };
 
-  var _getCssAccessors = function(selector, pseudo, browsers) {
-    var results = [];
-    if (!pseudo)
-      results.push($(selector));
+  var _cssHints = {
+    ':placeholder': {
+      webkit: "::-webkit-input-placeholder",
+      moz: "::-moz-placeholder",
+      ms: ":-ms-input-placeholder"
+    }
+  };
 
-    if (!browsers)
-      browsers = ['webkit', 'moz', 'ie'];
-    else if (typeof browsers == 'string')
-      browsers = browsers.split(',');
+  var _getCssAccessor = function(selector) {
+    var pos = selector.search(":");
+    if (pos < 0)
+      return $(selector);
 
-    if (pseudo === 'placeholder') {
-      if (browsers.indexOf('webkit') >= 0 )
-        results.push(_findStyleSheet(selector + "::-webkit-input-placeholder"));
-      if (browsers.indexOf('moz') >= 0 )
-        results.push(_findStyleSheet(selector + "::-moz-placeholder"));
-      if (browsers.indexOf('ie') >= 0 )
-        results.push(_findStyleSheet(selector + ":-ie-input-placeholder"));
+    var sel = selector.substring(0, pos);
+    var pseudo = selector.substring(pos);
+
+    var hints = _cssHints[pseudo]; 
+    if (hints) {
+      prefix = hints[_cssPrefix];
+      if (prefix)
+        return _findStyleSheet(sel + prefix);
     }
 
-    if (!results.length)
-      throw new Error(_format("no CSS accessors for '{0}/{1}'", selector, pseudo));
-
-    return results;
+    return _findStyleSheet(sel + pseudo);
   };
 
   var module = {
@@ -257,53 +268,49 @@
       throw _formatUnknown("font generic family", family);
     },
 
-    isFont: function(selector, font, pseudo/*=null*/, browsers/*=null*/) {
-      var variants = _getCssAccessors(selector, pseudo, browsers);
-      for (var i = 0; i < variants.length; i++) {
-        var el = variants[i];
+    isFont: function(selector, font) {
+      var el = _getCssAccessor(selector);
 
-        //var el = $(selector);
-        var value;
-        if (font.size) {
-          value = el.css("font-size");
-          _comparePixels(font.size, value, "font-size");
+      var value;
+      if (font.size) {
+        value = el.css("font-size");
+        _comparePixels(font.size, value, "font-size");
+      }
+      if (font.weight) {
+        //font-weight: normal|bold|bolder|lighter|number|initial|inherit;
+        value = el.css("font-weight");
+        _compareValues(font.weight, value, "font-weight");
+      }
+      if (font.style) {
+        //"style:normal|italic|oblique"
+        value = el.css("font-style");
+        _compareValues(font.style, value, "font-style");
+      }
+      if (font.variant) {
+        //variant: normal|small-caps|initial|inherit
+        value = el.css("font-variant");
+        _compareValues(font.variant, value, "font-variant");
+      }
+      if (font.family) {
+        value = el.css("font-family");
+        if (this.isGenericFontFamily(font.family)) {
+          value = this.getGenericFontFamily(value);
         }
-        if (font.weight) {
-          //font-weight: normal|bold|bolder|lighter|number|initial|inherit;
-          value = el.css("font-weight");
-          _compareValues(font.weight, value, "font-weight");
-        }
-        if (font.style) {
-          //"style:normal|italic|oblique"
-          value = el.css("font-style");
-          _compareValues(font.style, value, "font-style");
-        }
-        if (font.variant) {
-          //variant: normal|small-caps|initial|inherit
-          value = el.css("font-variant");
-          _compareValues(font.variant, value, "font-variant");
-        }
-        if (font.family) {
-          value = el.css("font-family");
-          if (this.isGenericFontFamily(font.family)) {
-            value = this.getGenericFontFamily(value);
-          }
-          _compareValues(font.family, value, "font-family");
-        }
-      };
+        _compareValues(font.family, value, "font-family");
+      }
 
       return true;
     },
 
     isColor: function(selector, colorProperty, value) {
-      var el = $(selector);
+      var el = _getCssAccessor(selector);
       var color = el.css(colorProperty);
       _compareColor(value, color, colorProperty);
       return true;
     },
 
     haveProperty: function(selector, property) {
-      var el = $(selector);
+      var el = _getCssAccessor(selector);
       var prop = el.css(property);
       if (!prop || prop == 'none')
         throw _format("selector '{0}' have not CSS property '{1}'", selector, property);
@@ -320,7 +327,7 @@
     },
 
     isBox: function(selector, box) {
-      var el = $(selector);
+      var el = _getCssAccessor(selector);
       var value;
       if (box.padding) {
         value = el.css("padding");
