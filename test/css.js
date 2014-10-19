@@ -37,25 +37,25 @@ describe("css", function(){
     });
   });
 
-  describe(".header__title", function(){
+  describe(".todo__title", function(){
     it('should be 100px height', function() {
-      expect(cstyle.getHeight('.header__title')).equal(100);
+      expect(cstyle.getHeight('.todo__title')).equal(100);
     });
 
     it('should be "todos"', function() {
-      expect(cstyle.getText('.header__title')).equal('todos');
+      expect(cstyle.getText('.todo__title')).equal('todos');
     });
 
     it('should be centered', function() {
-      expect(cstyle.isCentered('.todo__header', '.header__title')).ok;
+      expect(cstyle.isCentered('.todo__header', '.todo__title')).ok;
     });
 
     it('should be only content', function() {
-      expect(cstyle.isContentOnly('.header__title')).ok;
+      expect(cstyle.isContentOnly('.todo__title')).ok;
     });
 
     it('text should be bold fontface', function() {
-      expect(cstyle.isFont('.header__title', {
+      expect(cstyle.isFont('.todo__title', {
         size: "70px",
         weight: "bold",
         family: "sans-serif",
@@ -63,12 +63,12 @@ describe("css", function(){
     });
 
     it('text color', function() {
-      expect(cstyle.isColor('.header__title', 'color', headerTitleTextColor)).ok;
+      expect(cstyle.isColor('.todo__title', 'color', headerTitleTextColor)).ok;
     });
 
     //text-shadow: -1px -1px rgba(0, 0, 0, 0.2);
     it('should have shadow', function() {
-      cstyle.haveProperty('.header__title', 'text-shadow');
+      cstyle.haveProperty('.todo__title', 'text-shadow');
     });
 
   });
@@ -80,16 +80,16 @@ describe("css", function(){
     });
 
     it('should have splitter', function() {
-      expect(cstyle.isOnTop('.todo__caption', '.caption__splitter'));
-      expect(cstyle.isFitWidth('.todo', '.caption__splitter'));
-      expect(cstyle.getHeight('.caption__splitter')).equal(splitterHeight);
-      expect(cstyle.isColor('.caption__splitter', 'background-color', splitterColor));
+      expect(cstyle.isOnTop('.todo__caption', '.todo__splitter'));
+      expect(cstyle.isFitWidth('.todo', '.todo__splitter'));
+      expect(cstyle.getHeight('.todo__splitter')).equal(splitterHeight);
+      expect(cstyle.isColor('.todo__splitter', 'background-color', splitterColor));
      });
     
     it('should have input', function() {
-      expect(cstyle.isUnder('.caption__splitter', '.caption__input'));
-      expect(cstyle.isFitWidth('.todo', '.caption__input'));
-      expect(cstyle.isTag('.caption__input', 'input'));
+      expect(cstyle.isUnder('.todo__splitter', '.todo__input'));
+      expect(cstyle.isFitWidth('.todo', '.todo__input'));
+      expect(cstyle.isTag('.todo__input', 'input'));
     });
   });
 });

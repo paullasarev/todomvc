@@ -87,7 +87,8 @@
 
       if (elementRect.left != frameRect.left || elementRect.right != frameRect.right)
         throw this.formatRequired(this.format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
-         , elementRect.left, frameRect.left);
+         , String(elementRect.left) + "/" + String(elementRect.right)
+         , String(frameRect.left) + "/" + String(frameRect.right));
 
       return true;
     },
