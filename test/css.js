@@ -117,6 +117,7 @@ describe("css", function(){
       cstyle.isColor('.todo__input', 'background-color', inputBackgroundColor);
 
       cstyle.isAttribute('.todo__input', 'placeholder', 'What needs to be done?');
+      cstyle.isTextVCentered('.todo__input');
     });
       
     it('input placeholder font should be italic', function() {

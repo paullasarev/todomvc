@@ -256,7 +256,9 @@
       var el = $(selector);
       var height = _pixelsToInt(el.css('height'));
       var lineHeight = _pixelsToInt(el.css('line-height'));
-      return height === lineHeight && height > 0;
+      if (! (height === lineHeight && height > 0))
+        throw new Error(_format("'Text in '{0}'' is not vertically centered", selector));
+      return true;
     },
 
 
