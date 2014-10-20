@@ -123,9 +123,9 @@ describe("css", function(){
     it('input placeholder font should be italic', function() {
       cstyle.isFont('.todo__input:placeholder',  {
         style: 'italic',
-        weight: '200'
+        weight: '200',
+        color: '#999999',
       });
-      cstyle.isColor('.todo__input:placeholder', 'color', '#999999');
     });
   });
 });

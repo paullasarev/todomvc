@@ -2,10 +2,32 @@
   var $ = window.jQuery;
   var _tinycolor = window.tinycolor;
 
-  var _pixelsToInt = function (val) {
+  var _pixelsToInt = function(val) {
     if (!val)
       return 0;
     return parseInt(val, 10);
+  };
+
+  var _fontSize = function(value) {
+    return _pixelsToInt(value);
+  };
+
+  var _elFontSize = function(el) {
+    return _fontSize(el.css("font-size"));
+  };
+  
+  var _elLineHeight = function(el) {
+    var value = el.css('line-height');
+    if (value === 'normal')
+      return _fontSize(el.css("font-size")) * 1.2;
+
+    if (/[0-9]+\.[0-9]/.test(value))
+      return parseFloat(val) * _fontSize(el.css("font-size"));
+
+    if (/[0-9]+\%/.test(value))
+      return parseInt(value) * _fontSize(el.css("font-size"));
+
+    return _pixelsToInt(value);
   };
 
   var _format = function(msg, val0, val1) {
@@ -253,12 +275,13 @@
     },
 
     isTextVCentered: function(selector) {
-      var el = $(selector);
-      var height = _pixelsToInt(el.css('height'));
-      var lineHeight = _pixelsToInt(el.css('line-height'));
-      if (! (height === lineHeight && height > 0))
-        throw new Error(_format("'Text in '{0}'' is not vertically centered", selector));
-      return true;
+      var el = _getCssAccessor(selector);
+      var lineHeight = _elLineHeight(el);
+      var fontSize = _elFontSize(el);
+      if (fontSize < lineHeight)
+        return true;
+
+      throw new Error(_format("'Text in '{0}'' is not vertically centered", selector));
     },
 
 
@@ -323,6 +346,10 @@
           value = this.getGenericFontFamily(value);
         }
         _compareValues(font.family, value, "font-family");
+      }
+      if (font.color) {
+        value = el.css("color");
+        _compareColor(value, font.color, "color");
       }
 
       return true;
