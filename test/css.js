@@ -127,5 +127,45 @@ describe("css", function(){
         color: '#999999',
       });
     });
+
+    it('should have dotted bottom', function() {
+      cstyle.isBox('.todo__caption', {
+        'border-bottom': "dotted 1px #ccc",
+      });
+    });
+
+  });
+
+  describe(".todo__item", function(){
+    it('should have item', function() {
+      expect(cstyle.isUnder('.todo__caption', '.todo__item'));
+      expect(cstyle.isFitWidth('.todo', '.todo__item'));
+      expect(cstyle.isTag('.todo__item', 'div'));
+    });
+
+    it('should fix parameters', function() {
+      expect(cstyle.getHeight('.todo__item')).equal(inputHeight);
+      cstyle.isBox('.todo__item', {
+        paddingLeft: inputLeftPadding,
+        paddingRight: inputRightPadding,
+        'border-left': "none",
+        'border-right': "none",
+        margin: 0,
+      });
+      expect(cstyle.isFont('.todo__item', {
+        size: inputFontSize,
+        style: "normal",
+        family: "sans-serif",
+      }));
+
+      cstyle.isColor('.todo__item', 'background-color', inputBackgroundColor);
+      cstyle.isTextVCentered('.todo__item');
+    });
+    it('should have dotted bottom', function() {
+      cstyle.isBox('.todo__item', {
+        'border-bottom': "dotted 1px #ccc",
+      });
+    });
+
   });
 });

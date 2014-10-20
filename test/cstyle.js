@@ -150,6 +150,23 @@
     return _findStyleSheet(sel + pseudo);
   };
 
+  var _checkBoxBorder = function(el, boxBorder, prefix) {
+    var border = _parseBorder(boxBorder);
+    if (border.style) {
+      value = el.css(prefix + "-style");
+      _compareValues(_none(border.style), _none(value), "style");
+    }
+    if (border.width) {
+      value = el.css(prefix + "-width");
+      _comparePixels(border.width, value, "width");
+    }
+    if (border.color) {
+      value = el.css(prefix + "-color");
+      _compareColor(border.color, value, prefix + "-color");
+    }
+  }
+
+
   var module = {
     tinycolor: _tinycolor,
 
@@ -403,21 +420,11 @@
         _comparePixels(box.margin, value, "margin");
       }
 
-      if (box.border) {
-        var border = _parseBorder(box.border);
-        if (border.style) {
-          value = el.css("border-style");
-          _compareValues(_none(border.style), _none(value), "style");
-        }
-        if (border.width) {
-          value = el.css("border-width");
-          _comparePixels(border.width, value, "width");
-        }
-        if (border.color) {
-          value = el.css("border-color");
-          _compareColor(border.color, value, "border-color");
-        }
-      }
+      ['border', 'border-bottom', 'border-top', 'border-left', 'border-right']
+      .forEach(function(prefix) {
+        if (box[prefix])
+          _checkBoxBorder(el, box[prefix], prefix);
+      });
 
       return true;
     },
