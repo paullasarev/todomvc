@@ -1,6 +1,6 @@
 describe("css", function(){
-  var expect = need.import('chai').expect;
-  var ctyle = need.import('cstyle');
+  var expect = window.chai.expect;
+  var ctyle = window.cstyle;
 
   var bodyBackgroundColor = '#e0e0e0';
   var headerTitleTextColor = '#c7c7c7';

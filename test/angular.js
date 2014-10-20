@@ -1,8 +1,5 @@
 describe("angular", function(){
-  // var $ = need.import('jQuery');
-  // var expect = need.import('chai').expect;
-  // var angular = need.import('angular');
-  var $ = window.$;
+  var $ = window.jQuery;
   var expect = window.chai.expect;
   var angular = window.angular;
 

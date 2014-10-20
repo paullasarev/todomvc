@@ -1,6 +1,6 @@
 ;(function(){
-  var $ = need.import('jQuery');
-  var _tinycolor = need.import('tinycolor');
+  var $ = window.jQuery;
+  var _tinycolor = window.tinycolor;
 
   var _pixelsToInt = function (val) {
     if (!val)
@@ -401,7 +401,6 @@
 
   };
 
-  need.export('cstyle', module);
-
+  window.cstyle = module;
 
 })();
