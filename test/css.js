@@ -11,9 +11,10 @@ describe("css", function(){
 
   var inputHeight = 48;
   var inputFontSize = 23;
-  var inputLeftPadding = 40;
-  var inputRightPadding = 16;
+  var inputCheckWidth = 40;
+  var inputDelWidth = 16;
   var inputBackgroundColor = "#f4f4f4";
+  var itemSplitterWidth = 4;
 
   describe("body", function(){
     it('body should be clean', function() {
@@ -63,15 +64,16 @@ describe("css", function(){
     });
 
     it('text should be bold fontface', function() {
-      expect(cstyle.isFont('.todo__title', {
+      cstyle.isFont('.todo__title', {
         size: "70px",
         weight: "bold",
         family: "sans-serif",
-        style: "normal",    })).ok;
+        style: "normal",    
+      });
     });
 
     it('text color', function() {
-      expect(cstyle.isColor('.todo__title', 'color', headerTitleTextColor)).ok;
+      cstyle.isColor('.todo__title', 'color', headerTitleTextColor);
     });
 
     //text-shadow: -1px -1px rgba(0, 0, 0, 0.2);
@@ -83,36 +85,37 @@ describe("css", function(){
 
   describe(".todo__caption", function(){
     it('should fit after header todo', function() {
-      expect(cstyle.isUnder('.todo__header', '.todo__caption'));
-      expect(cstyle.isFitWidth('.todo', '.todo__caption'));
+      cstyle.isUnder('.todo__header', '.todo__caption');
+      cstyle.isFitWidth('.todo', '.todo__caption');
     });
 
     it('should have splitter', function() {
-      expect(cstyle.isOnTop('.todo__caption', '.todo__splitter'));
-      expect(cstyle.isFitWidth('.todo', '.todo__splitter'));
-      expect(cstyle.getHeight('.todo__splitter')).equal(splitterHeight);
-      expect(cstyle.isColor('.todo__splitter', 'background-color', splitterColor));
+      cstyle.isOnTop('.todo__caption', '.todo__splitter');
+      cstyle.isFitWidth('.todo', '.todo__splitter');
+      cstyle.isHeight('.todo__splitter', splitterHeight);
+      cstyle.isColor('.todo__splitter', 'background-color', splitterColor);
      });
     
     it('should have input', function() {
-      expect(cstyle.isUnder('.todo__splitter', '.todo__input'));
-      expect(cstyle.isFitWidth('.todo', '.todo__input'));
-      expect(cstyle.isTag('.todo__input', 'input'));
+      cstyle.isUnder('.todo__splitter', '.todo__input');
+      cstyle.isFitWidth('.todo', '.todo__input');
+      cstyle.isTag('.todo__input', 'input');
     });
 
     it('should fix input parameters', function() {
-      expect(cstyle.getHeight('.todo__input')).equal(inputHeight);
+      cstyle.isHeight('.todo__input', inputHeight);
       cstyle.isBox('.todo__input', {
-        paddingLeft: inputLeftPadding,
-        paddingRight: inputRightPadding,
+        paddingLeft: inputCheckWidth,
+        paddingRight: inputDelWidth,
         border: "none",
         margin: 0,
       });
-      expect(cstyle.isFont('.todo__input', {
+
+      cstyle.isFont('.todo__input', {
         size: inputFontSize,
         style: "normal",
         family: "sans-serif",
-      }));
+      });
 
       cstyle.isColor('.todo__input', 'background-color', inputBackgroundColor);
 
@@ -136,36 +139,88 @@ describe("css", function(){
 
   });
 
-  describe(".todo__item", function(){
+  describe(".todo__list", function(){
+    var sel = '.todo__list';
     it('should have item', function() {
-      expect(cstyle.isUnder('.todo__caption', '.todo__item'));
-      expect(cstyle.isFitWidth('.todo', '.todo__item'));
-      expect(cstyle.isTag('.todo__item', 'div'));
+      cstyle.isUnder('.todo__caption', sel);
+      cstyle.isFitWidth('.todo', sel);
+      cstyle.isTag(sel, 'div');
+    });
+  });
+
+  describe(".todo__item", function(){
+    var sel = '.todo__item';
+    it('should have item', function() {
+      cstyle.isOnTop('.todo__list', sel);
+      cstyle.isFitWidth('.todo', sel);
+      cstyle.isTag(sel, 'div');
     });
 
     it('should fix parameters', function() {
-      expect(cstyle.getHeight('.todo__item')).equal(inputHeight);
-      cstyle.isBox('.todo__item', {
-        paddingLeft: inputLeftPadding,
-        paddingRight: inputRightPadding,
+      cstyle.isHeight(sel, inputHeight);
+      cstyle.isBox(sel, {
         'border-left': "none",
         'border-right': "none",
         margin: 0,
       });
-      expect(cstyle.isFont('.todo__item', {
+      cstyle.isFont(sel, {
         size: inputFontSize,
         style: "normal",
         family: "sans-serif",
-      }));
+      });
 
-      cstyle.isColor('.todo__item', 'background-color', inputBackgroundColor);
-      cstyle.isTextVCentered('.todo__item');
+      cstyle.isColor(sel, 'background-color', inputBackgroundColor);
     });
+
     it('should have dotted bottom', function() {
-      cstyle.isBox('.todo__item', {
+      cstyle.isBox(sel, {
         'border-bottom': "dotted 1px #ccc",
       });
     });
 
+
+    it('should have check button', function() {
+      var sel = '.todo__item__check';
+      cstyle.isTag(sel, 'input');
+      cstyle.isAttribute(sel, 'type', 'checkbox');
+      cstyle.isBox(sel, {
+        width: inputCheckWidth,
+        color: inputBackgroundColor,
+        border: 'none',
+      });
+      cstyle.isFitHeight('.todo__item', sel);
+      cstyle.isStartOnLeft('.todo__item', sel);
+    });
+
+    it('should have splitter', function() {
+      var sel = '.todo__item__splitter';
+      cstyle.isTag(sel, 'div');
+      cstyle.isBox(sel, {
+        width: itemSplitterWidth,
+        color: inputBackgroundColor,
+        borderLeft: 'solid 1px red',
+        borderRight: 'solid 1px red',
+        borderTop: 'none',
+        borderBottom: 'none',
+      });
+      cstyle.isFitHeight('.todo__item', sel);
+      cstyle.isOnRight('.todo__item__check', sel);
+    });
+
+    it('should have value', function() {
+      var sel = '.todo__item__value';
+      cstyle.isTag(sel, 'div');
+      cstyle.isBox(sel, {
+        color: inputBackgroundColor,
+        width: todoWidth - inputDelWidth - inputCheckWidth - itemSplitterWidth,
+        border: 'none',
+        paddingLeft: 15,
+      });
+      cstyle.isFitHeight('.todo__item', sel);
+      cstyle.isOnRight('.todo__item__splitter', sel);
+      cstyle.isTextVCentered(sel);
+    });
+
   });
+
 });

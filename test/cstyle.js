@@ -16,6 +16,10 @@
     return _fontSize(el.css("font-size"));
   };
   
+  var _elHeight = function(el) {
+    return _pixelsToInt(el.css("height"));
+  };
+
   var _elLineHeight = function(el) {
     var value = el.css('line-height');
     if (value === 'normal')
@@ -34,9 +38,9 @@
     return msg.replace("{0}", val0). replace("{1}", val1);
   };
 
-  var _formatRequired = function(msg0, val0, val1) {
+  var _formatRequired = function(msg0, actual, required) {
     var msg = msg0 + " is '{0}' while required '{1}'";
-    return _format(msg, val0, val1);
+    return _format(msg, actual, required);
   };
 
   var _formatUnknown = function(msg, val) {
@@ -121,6 +125,7 @@
         }
       }
     }
+
     throw new Error(_format("didn't find pseudo selector {0}", selector));  
   };
 
@@ -203,8 +208,8 @@
 
       //http://javascript.ru/ui/offset
       if (!success)
-        throw _formatRequired(_format("horisontal center of '{0}' in '{1}'", elementSelector, frameSelector)
-         , elementCenter, frameCenter);
+        throw new Error(_formatRequired(_format("horisontal center of '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementCenter, frameCenter));
 
       return true;
     },
@@ -220,8 +225,8 @@
       var success = (offset <= 0.5);
 
       if (!success)
-        throw _formatRequired(_format("vertical center of '{0}' in '{1}'", elementSelector, frameSelector)
-         , elementCenter, frameCenter);
+        throw new Error(_formatRequired(_format("vertical center of '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementCenter, frameCenter));
 
       return true;
     },
@@ -232,12 +237,34 @@
     },
 
     isOnTop: function (frameSelector, elementSelector) {
-      var frameRect=this.getElementOffsetRect($(frameSelector).get(0));
-      var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
+      var frameRect=this.getOffsetRect(frameSelector);
+      var elementRect=this.getOffsetRect(elementSelector);
 
       if (elementRect.top != frameRect.top)
-        throw _formatRequired(_format("top '{0}' in '{1}'", elementSelector, frameSelector)
-         , elementRect.top, frameRect.top);
+        throw new Error(_formatRequired(_format("top '{0}' in '{1}'", elementSelector, frameSelector)
+         , elementRect.top, frameRect.top));
+
+      return true;
+    },
+
+    isOnRight: function (frameSelector, elementSelector) {
+      var frameRect=this.getOffsetRect(frameSelector);
+      var elementRect=this.getOffsetRect(elementSelector);
+
+      if (elementRect.left != frameRect.right)
+        throw new Error(_formatRequired(_format(" '{0}' is on right of  '{1}'", elementSelector, frameSelector)
+         , elementRect.left, frameRect.right));
+
+      return true;
+    },
+
+    isStartOnLeft: function (frameSelector, elementSelector) {
+      var frameRect=this.getOffsetRect(frameSelector);
+      var elementRect=this.getOffsetRect(elementSelector);
+
+      if (elementRect.left != frameRect.left)
+        throw new Error(_formatRequired(_format(" '{0}' is start on left '{1}'", elementSelector, frameSelector)
+         , elementRect.left, frameRect.left));
 
       return true;
     },
@@ -247,9 +274,21 @@
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.left != frameRect.left || elementRect.right != frameRect.right)
-        throw _formatRequired(_format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
+        throw new Error(_formatRequired(_format("fit width '{0}' in '{1}'", elementSelector, frameSelector)
          , String(elementRect.left) + "/" + String(elementRect.right)
-         , String(frameRect.left) + "/" + String(frameRect.right));
+         , String(frameRect.left) + "/" + String(frameRect.right)));
+
+      return true;
+    },
+
+    isFitHeight: function (frameSelector, elementSelector) {
+      var frameRect=this.getOffsetRect(frameSelector);
+      var elementRect=this.getOffsetRect(elementSelector);
+
+      if (elementRect.top != frameRect.top || elementRect.bottom != frameRect.bottom)
+        throw new Error(_formatRequired(_format("fit height '{0}' in '{1}'", elementSelector, frameSelector)
+         , String(elementRect.top) + "/" + String(elementRect.bottom)
+         , String(frameRect.top) + "/" + String(frameRect.bottom)));
 
       return true;
     },
@@ -259,8 +298,8 @@
       var elementRect=this.getElementOffsetRect($(elementSelector).get(0));
 
       if (elementRect.top != frameRect.bottom)
-        throw _formatRequired(_format("'{0}' under '{1}'", elementSelector, frameSelector)
-         , elementRect.top, frameRect.bottom);
+        throw new Error(_formatRequired(_format("'{0}' under '{1}'", elementSelector, frameSelector)
+         , elementRect.top, frameRect.bottom));
 
       return true;
     },
@@ -291,11 +330,38 @@
       return this.getOffsetRect(selector).width;
     },
 
+    isHeight: function(selector, required) {
+      var actual = this.getHeight(selector);
+      if (actual !== required)
+        throw new Error(_formatRequired('height', actual, required));
+    },
+
+    isWidth: function(selector, required) {
+      var actual = this.getWidth(selector);
+      if (actual !== required)
+        throw new Error(_formatRequired('width', actual, required));
+    },
+
+    isLeft: function(selector, required) {
+      var actual = this.getOffsetRect(selector).left;
+      if (actual !== required)
+        throw new Error(_formatRequired('left', actual, required));
+    },
+
+    isRight: function(selector, required) {
+      var actual = this.getOffsetRect(selector).right;
+      if (actual !== required)
+        throw new Error(_formatRequired('right', actual, required));
+    },
+
     isTextVCentered: function(selector) {
       var el = _getCssAccessor(selector);
       var lineHeight = _elLineHeight(el);
-      var fontSize = _elFontSize(el);
-      if (fontSize < lineHeight)
+      // var fontSize = _elFontSize(el);
+      // if (fontSize < lineHeight)
+      //   return true;
+      var height = _elHeight(el);
+      if (lineHeight >= height)
         return true;
 
       throw new Error(_format("'Text in '{0}'' is not vertically centered", selector));
@@ -331,7 +397,7 @@
         ) 
         return "monospace";
 
-      throw _formatUnknown("font generic family", family);
+      throw new Error(_formatUnknown("font generic family", family));
     },
 
     isFont: function(selector, font) {
@@ -383,7 +449,7 @@
       var el = _getCssAccessor(selector);
       var prop = el.css(property);
       if (!prop || prop == 'none')
-        throw _format("selector '{0}' have not CSS property '{1}'", selector, property);
+        throw new Error(_format("selector '{0}' have not CSS property '{1}'", selector, property));
 
       return true;
     },
@@ -391,40 +457,52 @@
     isTag: function(selector, tagName) {
       var value = $(selector).get(0).tagName;
       if (value.toLowerCase() !== tagName.toLowerCase())
-        throw _formatRequired("tag name", value, tagName);
+        throw new Error(_formatRequired("tag name", value, tagName));
 
       return true;
     },
 
     isBox: function(selector, box) {
       var el = _getCssAccessor(selector);
-      var value;
 
-      if (box.padding) {
-        _comparePixels(box.padding, el.css("padding-left"), "padding-left");
-        _comparePixels(box.padding, el.css("padding-right"), "padding-right");
-        _comparePixels(box.padding, el.css("padding-top"), "padding-top");
-        _comparePixels(box.padding, el.css("padding-bottom"), "padding-bottom");
-      }
-      if (box['padding-left'])
-        _comparePixels(box.padding, el.css("padding-left"), "padding-left");
-      if (box['padding-right'])
-        _comparePixels(box.padding, el.css("padding-right"), "padding-right");
-      if (box['padding-top'])
-        _comparePixels(box.padding, el.css("padding-top"), "padding-top");
-      if (box['padding-bottom'])
-        _comparePixels(box.padding, el.css("padding-bottom"), "padding-bottom");
+      ['padding', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom']
+      .forEach(function(prefix){
+        if (box[prefix])
+          _comparePixels(box[prefix], el.css(prefix), prefix);
+        else if (box[_camelCase(prefix)])
+          _comparePixels(box[_camelCase(prefix)], el.css(prefix), prefix);
+      });
 
-      if (box.margin) {
-        value = el.css("margin");
-        _comparePixels(box.margin, value, "margin");
-      }
+      ['margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom']
+      .forEach(function(prefix){
+        if (box[prefix]) {
+          _comparePixels(box[prefix], el.css(prefix), prefix);
+        }
+        else if (box[_camelCase(prefix)]) {
+          _comparePixels(box[_camelCase(prefix)], el.css(prefix), prefix);
+        }
+      });
 
       ['border', 'border-bottom', 'border-top', 'border-left', 'border-right']
       .forEach(function(prefix) {
         if (box[prefix])
           _checkBoxBorder(el, box[prefix], prefix);
+        else if (box[_camelCase(prefix)])
+          _checkBoxBorder(el, box[_camelCase(prefix)], prefix);
       });
+
+      if (box.color) {
+        _compareColor(box.color, el.css("background-color"), "color");
+      }
+
+      if (box.width)
+        this.isWidth(selector, box.width);
+
+      if (box.height)
+        this.isHeight(selector, box.height);
+
+      if (box.sizing)
+        _compareValues(box.sizing, el.css('box-sizing'), 'box-sizing');
 
       return true;
     },
