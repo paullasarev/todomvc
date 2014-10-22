@@ -111,6 +111,10 @@ describe("css", function(){
         margin: 0,
       });
 
+      cstyle.isBox('.todo__input:', {
+        outline: "none",
+      });
+
       cstyle.isFont('.todo__input', {
         size: inputFontSize,
         style: "normal",
