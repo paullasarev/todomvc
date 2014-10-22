@@ -130,6 +130,9 @@
   }
 
   function _isOutline(selector, required) {
+    var pos = selector.search(":");
+    if (pos < 0)
+      selector += ":";
     var outline = _parseBorder(required);
     var value;
     if (outline.style) {

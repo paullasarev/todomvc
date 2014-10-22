@@ -109,9 +109,6 @@ describe("css", function(){
         paddingRight: inputDelWidth,
         border: "none",
         margin: 0,
-      });
-
-      cstyle.isBox('.todo__input:', {
         outline: "none",
       });
 
