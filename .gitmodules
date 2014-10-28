@@ -1,0 +1,3 @@
+[submodule "tdstyle"]
+	path = tdstyle
+	url = https://github.com/paullasarev/tdstyle.git
