@@ -45,7 +45,12 @@ body {
   font-family: Helvetica;
   background-color: #f4f4f4;
   border: none;
+  outline: none;
 }
+
+.todo__input:hover {
+}
+
 
 .todo__input::-webkit-input-placeholder {
   font-style: italic;
@@ -72,7 +77,6 @@ body {
 .todo__item__check {
   float: left;
   display: inline-block;
-  background-color: #f4f4f4;
   width: 40px;
   height: 48px;
   margin: 0;
@@ -81,7 +85,6 @@ body {
 .todo__item__splitter {
   float: left;
   display: inline-block;
-  background-color: #f4f4f4;
   border-left: solid 1px red;
   border-right: solid 1px red;
   box-sizing: border-box;
@@ -95,7 +98,6 @@ body {
   display: inline-block;
   position: absolute;
   float: left;
-  background-color: #f4f4f4;
   padding-left: 15px;
   height: 48px;
   width: 490px;

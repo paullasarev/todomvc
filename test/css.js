@@ -109,6 +109,7 @@ describe("css", function(){
         paddingRight: inputDelWidth,
         border: "none",
         margin: 0,
+        outline: "none",
       });
 
       tdstyle.isFont('.todo__input', {
