@@ -8,6 +8,7 @@ app.use(morgan('dev'));
 app.use(express.static(__dirname + '/app'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use('/test', express.static(__dirname + '/test'));
+app.use('/tdstyle', express.static(__dirname + '/tdstyle'));
 //app.use(app.router);
 
 app.listen(port, function(){
